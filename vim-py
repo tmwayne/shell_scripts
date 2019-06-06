@@ -1,0 +1,63 @@
+#!/bin/bash
+
+USAGE='Usage: vim-py [-o output_dir] [-p port]'
+
+## ARGUMENTS
+##############################
+
+while getopts ":e:o:p:" opt; do
+  case $opt in
+    h)
+      echo $USAGE
+      exit 0
+      ;;
+    e)
+      VENV=$OPTARG
+      ;;
+    o)
+      OUTPUT_DIR=$OPTARG
+      ;;
+    p)
+      PORT=$OPTARG
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+OUTPUT_DIR=${OUTPUT_DIR:-output}
+PORT=${PORT:-8080}
+
+VENV=${VENV:-py-env}
+
+## Use virtual environment if specified
+if [ -d "$VENV" ] ; then
+  IPYTHON=$VENV/bin/ipython3
+elif [ -f "$(which ipython3)" ] ; then
+  IPYTHON=$(which ipython3)
+fi
+
+## ASSERTIONS
+##############################
+
+## MAIN
+##############################
+
+START_SERVER="python3 -m http.server $PORT"
+
+## 1) SERVER:  webserver to enable viewing output from browser
+tmux new-session -s "vim-py" -n SERVER -d $START_SERVER
+
+## 2) SHELL: bash shell to run commands
+tmux new-window -n "SHELL"
+
+## 3) REPL: Python REPL using Vim and IPython
+tmux new-window -n "REPL" vim
+tmux split-window -v $IPYTHON
+tmux last-pane
+
+## Attach session to current client
+tmux -2 attach-session -t "vim-py"
+
