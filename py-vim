@@ -33,7 +33,7 @@ PORT=${PORT:-8080}
 VENV=${VENV:-py-env}
 
 ## Use virtual environment if specified
-if [ -d "$VENV" ] ; then
+if [ -f "$VENV/bin/ipython3" ] ; then
   IPYTHON=$VENV/bin/ipython3
 elif [ -f "$(which ipython3)" ] ; then
   IPYTHON=$(which ipython3)
@@ -46,18 +46,19 @@ fi
 ##############################
 
 START_SERVER="python3 -m http.server $PORT"
+SESSION=$$
 
 ## 1) SERVER:  webserver to enable viewing output from browser
-tmux new-session -s "vim-py" -n SERVER -d $START_SERVER
+tmux new-session -s $SESSION -n SERVER -d $START_SERVER
 
 ## 2) SHELL: bash shell to run commands
-tmux new-window -n "SHELL"
+tmux new-window -n SHELL
 
 ## 3) REPL: Python REPL using Vim and IPython
-tmux new-window -n "REPL" vim
+tmux new-window -n REPL vim
 tmux split-window -v $IPYTHON
 tmux last-pane
 
 ## Attach session to current client
-tmux -2 attach-session -t "vim-py"
+tmux -2 attach-session -t $SESSION
 
