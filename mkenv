@@ -1,0 +1,7 @@
+#!/bin/bash
+
+USAGE='Usage: mkenv [name]'
+
+ENV_NAME=${ENV_NAME:-py-env}
+
+python3 -m venv $ENV_NAME
