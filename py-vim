@@ -1,11 +1,12 @@
 #!/bin/bash
 
-USAGE='Usage: vim-py [-o output_dir] [-p port]'
+USAGE='Usage: vim-py [-e virtual_env] [-p port] [vim_args]'
 
-## ARGUMENTS
+## VARIABLES
 ##############################
 
-while getopts ":e:o:p:" opt; do
+# Command-line arguments
+while getopts ":he:o:p:" opt; do
   case $opt in
     h)
       echo $USAGE
@@ -27,9 +28,13 @@ while getopts ":e:o:p:" opt; do
 done
 shift $((OPTIND-1))
 
+VIM_ARGS=$@
+
+# File configurations
+
+# Program defined variables
 OUTPUT_DIR=${OUTPUT_DIR:-output}
 PORT=${PORT:-8080}
-
 VENV=${VENV:-py-env}
 
 ## Use virtual environment if specified
@@ -55,7 +60,7 @@ tmux new-session -s $SESSION -n SERVER -d $START_SERVER
 tmux new-window -n SHELL
 
 ## 3) REPL: Python REPL using Vim and IPython
-tmux new-window -n REPL vim
+tmux new-window -n REPL vim $VIM_ARGS
 tmux split-window -v $IPYTHON
 tmux last-pane
 
