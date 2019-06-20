@@ -10,20 +10,13 @@ while getopts ":he:o:p:" opt; do
   case $opt in
     h)
       echo $USAGE
-      exit 0
-      ;;
+      exit 0 ;;
     e)
-      VENV=$OPTARG
-      ;;
-    o)
-      OUTPUT_DIR=$OPTARG
-      ;;
+      VENV=$OPTARG ;;
     p)
-      PORT=$OPTARG
-      ;;
+      PORT=$OPTARG ;;
     \?)
-      echo "Invalid option: -$OPTARG" >&2
-      ;;
+      echo "Invalid option: -$OPTARG" >&2 ;;
   esac
 done
 shift $((OPTIND-1))
@@ -33,9 +26,8 @@ VIM_ARGS=$@
 # File configurations
 
 # Program defined variables
-OUTPUT_DIR=${OUTPUT_DIR:-output}
 PORT=${PORT:-8080}
-VENV=${VENV:-py-env}
+VENV=${VENV:-.env-py}
 
 ## Use virtual environment if specified
 if [ -f "$VENV/bin/ipython3" ] ; then
@@ -53,17 +45,27 @@ fi
 START_SERVER="python3 -m http.server $PORT"
 SESSION=$$
 
-## 1) SERVER:  webserver to enable viewing output from browser
-tmux new-session -s $SESSION -n SERVER -d $START_SERVER
+if ! tmux ls > /dev/null 2>&1 ; then
+  ## 1) SERVER:  webserver to enable viewing output from browser
+  tmux new-session -s $SESSION -n SERVER -d $START_SERVER
 
-## 2) SHELL: bash shell to run commands
-tmux new-window -n SHELL
+  ## 2) SHELL: bash shell to run commands
+  tmux new-window -n SHELL
 
-## 3) REPL: Python REPL using Vim and IPython
-tmux new-window -n REPL vim $VIM_ARGS
-tmux split-window -v $IPYTHON
-tmux last-pane
+  ## 3) IDE: Python IDE using Vim and IPython
+  tmux new-window -n IDE vim $VIM_ARGS
+  tmux split-window -h $IPYTHON
+  tmux last-pane
 
-## Attach session to current client
-tmux -2 attach-session -t $SESSION
+  ## Attach session to current client
+  tmux -2 attach-session -t $SESSION
+else
+
+  ## IDE: Python IDE using Vim and IPython
+  tmux new-window -n IDE vim $VIM_ARGS
+  tmux split-window -h $IPYTHON
+  tmux last-pane
+
+fi
+  
 

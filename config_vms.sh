@@ -30,7 +30,7 @@ fi
 DEFAULT_FILES=$(echo $HOME/{.vimrc,.bash_profile,.bash_cheatsheet.txt})
 FILES=${FILES:-$DEFAULT_FILES}
 
-DEFAULT_DIRS=$(echo $HOME/.vim/{ftplugin,templates,snippets})
+DEFAULT_DIRS=$(echo $HOME/.vim/{ftplugin,templates,snippets,ides})
 DIRS=${DIRS:-$DEFAULT_DIRS}
 
 for b in $BOXES ; do

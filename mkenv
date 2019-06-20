@@ -2,6 +2,6 @@
 
 USAGE='Usage: mkenv [name]'
 
-ENV_NAME=${ENV_NAME:-py-env}
+ENV_NAME=${ENV_NAME:-.env-py}
 
 python3 -m venv $ENV_NAME
