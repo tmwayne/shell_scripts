@@ -26,14 +26,17 @@ VIM_ARGS=$@
 # File configurations
 
 # Program defined variables
-PORT=${PORT:-8080}
+PORT=${VIMPY_PORT:-${PORT:-8080}}
 VENV=${VENV:-.env-py}
 
 ## Use virtual environment if specified
 if [ -f "$VENV/bin/ipython3" ] ; then
   IPYTHON=$VENV/bin/ipython3
-elif [ -f "$(which ipython3)" ] ; then
-  IPYTHON=$(which ipython3)
+elif [ -f "$HOME/.env-py/bin/ipython" ] ; then
+  IPYTHON=~/.env-py/bin/ipython3
+else
+  echo 'ERROR: unable to find ipython3'
+  exit 1
 fi
 
 ## ASSERTIONS
@@ -45,7 +48,9 @@ fi
 START_SERVER="python3 -m http.server $PORT"
 SESSION=$$
 
-if ! tmux ls > /dev/null 2>&1 ; then
+# if ! tmux ls > /dev/null 2>&1 ; then
+if [ -z "$TMUX" ]; then
+
   ## 1) SERVER:  webserver to enable viewing output from browser
   tmux new-session -s $SESSION -n SERVER -d $START_SERVER
 

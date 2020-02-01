@@ -5,7 +5,7 @@
 while getopts ":d:" opt; do
   case $opt in
     d)
-      DELIM="-d $OPTARG"
+      DELIM="$OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -26,6 +26,12 @@ else
   COLUMN=$2
 fi
 
-let IND=$( print_header $DELIM $FILE | sed -n "/$COLUMN/=" )
-IND="-f $IND"
-cut $DELIM $IND $FILE
+DELIM=${DELIM:-'\t'}
+
+echo $DELIM
+
+# let IND=$( head -1 $FILE | sed "s/$DELIM/\\n/g" | sed -n "/$COLUMN/=" )
+echo $( head -1 $FILE | sed "s/$DELIM/\n/g" )
+# echo $IND
+# IND="-f $IND"
+# cut -d $DELIM -f $IND $FILE
